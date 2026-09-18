@@ -69,7 +69,7 @@ const GR = D.groups, AG = D.ages, ALL = D.all, COL = D.colors, VIEWS = D.views;
 
 
 let viewIdx = VIEWS.length - 1;          // 기본 = 가장 최근 보기
-let band = null;                         // 신뢰구간을 띄울 연령그룹
+let band = null;                         // 신뢰구간을 띄울 연령그룹 (초기값은 아래에서 ALL)
 const f2 = v => (v === null || v === undefined) ? '–' : v.toFixed(2);
 const f1 = v => (v === null || v === undefined) ? '–' : v.toFixed(1);
 
@@ -153,15 +153,16 @@ function mkChip(name, label) {
 }
 mkChip(null, '없음');
 GR.forEach(g => mkChip(g, g));
-function setBand(g) {
-  band = (band === g) ? null : g;
+function syncChips() {
   [...bar2.querySelectorAll('.chip')].forEach(c => {
     const on = (c.dataset.g || null) === band;
     c.classList.toggle('on', on);
     c.style.background = on ? COL[c.dataset.g] : '';
   });
-  render();
 }
+function setBand(g) { band = (band === g) ? null : g; syncChips(); render(); }
+band = ALL;                              // 기본 = 「전체」의 신뢰구간을 띄운다
+syncChips();
 
 // ── 차트 ───────────────────────────────────────────────────────────────────
 const chart = echarts.init(document.getElementById('chart'), null, { renderer: 'canvas' });
